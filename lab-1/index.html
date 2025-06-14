@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vue Book Store</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <h1>📚 Book Store</h1>
+    <div class="wishlist-button-container">
+      <button @click="toggleWishlist">📋 Display Wish List</button>
+    </div>
+
+    <!-- Home Page: Book Cards -->
+    <div class="books-container" v-if="!showWishlist">
+      <div
+        class="book-card"
+        v-for="book in books"
+        :key="book.ISBN"
+        :class="book.numberofpage < 50 ? 'less' : 'more'"
+      >
+        <img :src="book.Image" :alt="book.Name" />
+        <h3>{{ book.Name }}</h3>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Category:</strong> {{ book.Category }}</p>
+        <p><strong>Pages:</strong> {{ book.numberofpage }}</p>
+        <p><strong>Price:</strong> {{ formatPrice(book.price) }}</p>
+        <button @click="addToWishlist(book)">➕ Add to List</button>
+      </div>
+    </div>
+
+    <!-- Wishlist Table -->
+    <div v-else>
+      <button @click="toggleWishlist">⬅ Back to Books</button>
+      <h2>📄 Wishlist</h2>
+      <table border="1" cellpadding="10" cellspacing="0">
+        <thead>
+          <tr>
+            <th>ISBN</th>
+            <th>Name</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Pages</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(book, index) in wishlist" :key="book.ISBN">
+            <td>{{ book.ISBN }}</td>
+            <td>{{ book.Name }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.Category }}</td>
+            <td>{{ book.numberofpage }}</td>
+            <td>{{ formatPrice(book.price) }}</td>
+            <td><button @click="removeFromWishlist(index)">❌ Remove</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="books.js"></script>
+  <script>
+    Vue.createApp({
+      data() {
+        return {
+          books,
+          wishlist: [],
+          showWishlist: false
+        };
+      },
+      methods: {
+        addToWishlist(book) {
+          if (!this.wishlist.find(b => b.ISBN === book.ISBN)) {
+            this.wishlist.push(book);
+          }
+        },
+        removeFromWishlist(index) {
+          this.wishlist.splice(index, 1);
+        },
+        toggleWishlist() {
+          this.showWishlist = !this.showWishlist;
+        },
+        formatPrice(value) {
+          return new Intl.NumberFormat('ar-SA', {
+            style: 'currency',
+            currency: 'SAR',
+          }).format(value);
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
